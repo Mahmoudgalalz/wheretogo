@@ -12,7 +12,7 @@ interface OpenAIStreamPayload {
 	stream: boolean;
 	n: number;
 }
-const key= "process.env.OPENAI_API_KEY"
+const key= process.env.OPENAI_API_KEY
 async function OpenAIStream(payload: OpenAIStreamPayload) {
 	const encoder = new TextEncoder();
 	const decoder = new TextDecoder();
