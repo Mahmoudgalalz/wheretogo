@@ -7,6 +7,9 @@ module.exports = {
 				'primary':'#F6F6F6',
 				'secondary':'#331a33',
 				'accent':'#da62c4'
+			},
+			container:{
+				center:true
 			}
 		},
 	},
