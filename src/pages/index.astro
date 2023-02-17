@@ -1,10 +1,22 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Card from '../components/Card.astro';
+import Map from '../icons/Map.astro';
+import Github from '../icons/Github.astro';
 ---
 
 <Layout title="WhereToGo in Egypt">
-	<nav>
-		
-	</nav>
+	<main>
+		<nav class="flex justify-evenly m-auto">
+			<div class="flex">
+				<Map/>
+				<h class="text-xl font-bold text-secondary m-auto">WhereToGo</h>
+			</div>
+		</nav>
+		<section>
+			<div class="w-36 flex m-auto rounded-lg bg-primary shadow-lg p-2 justify-center border-2 border-secondary">
+				
+				<a class="flex"><Github/> Star in GitHub</a>
+			</div>
+		</section>
+	</main>
 </Layout>
