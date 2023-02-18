@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Map from '../icons/Map.astro';
 import Github from '../icons/Github.astro';
+import Loading from '../icons/Loading.astro';
 import { town,mode,purpose } from '../util/Lists';
 import Twitter from '../icons/Twitter.astro';
 
@@ -46,7 +47,7 @@ import Twitter from '../icons/Twitter.astro';
 				<label class="my-4" for="details">More details</label>
 				<input class="h-40 rounded-md p-2 border-secondary border-2" type="text" id="description" placeholder="in 9st close to The Metro station...">
 			</div>
-			<button id="btn" onclick="shipThePayload()" class="flex mx-auto p-2 border-2 border-secondary rounded-md my-10 shadow-lg hover:bg-secondary hover:text-primary duration-150 hover:scale-95">Gimmy The Places</button>
+			<button id="btn" onclick="shipThePayload()" class="flex mx-auto p-2 border-2 border-secondary rounded-md my-10 shadow-lg hover:bg-secondary hover:text-primary duration-150 hover:scale-95"><span id="load" class="hidden animate-spin"><Loading/></span><span id="btn-text">Gimmy The Places</span></button>
 			<div id="results">
 			</div>
 		</section>
@@ -73,6 +74,8 @@ import Twitter from '../icons/Twitter.astro';
 	const mode=document.querySelector('#mode')
 	const purpose=document.querySelector('#purpose')
 	const description=document.querySelector('#description')
+	const btn=document.querySelector('#btn-text')
+	
 	const tostingInfo=`Give me a list of 5 places in Egypt in ${city.value}
 ${mode.value ? `that fit the mode ${mode.value}.`:''} 
 ${purpose.value ? `Make sure its following this purpose ${purpose.value}.`:''}${description.value ? `and make sure that fit the following description as well ${description}.` : ''}${mode.value || purpose.value ? `If you do not have 5 recommendations that fit these criteria perfectly, do your best to suggest other places in this city ${city.value} that I might like.` :''}
@@ -80,10 +83,16 @@ Please return this response as a numbered list with the ${city.value}'s title, f
 `
 	async function shipThePayload(){
 		if (loading) return;
+		
 		recommendations = [];
 		searchResponse = '';
 		endStream = false;
 		loading = true;
+		if(loading){
+			document.querySelector('#load').classList.remove('hidden')
+			btn.classList.add('my-auto','ml-2')
+			btn.innerHTML= 'Processing...'
+		}	
 		const response=await fetch('/api/StreamAPI',{
 			method:'POST',
 			body: JSON.stringify({searched: tostingInfo}),
@@ -130,6 +139,7 @@ Please return this response as a numbered list with the ${city.value}'s title, f
 		 	recommendationComponent(ti,recommendation.description)
 		}
 		})
+		await reset()
 	}
 
 	 function recommendationComponent(place,details){
@@ -144,6 +154,9 @@ Please return this response as a numbered list with the ${city.value}'s title, f
 		main.appendChild(p)
 		results.appendChild(main)
 	}
-		
-	
+	function reset(){
+		btn.innerText='Gimmy The Places'
+		document.querySelector('#load').classList.add('hidden')
+		btn.classList.remove('my-auto','ml-2')
+	}
 </script>
