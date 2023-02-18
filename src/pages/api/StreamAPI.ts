@@ -16,9 +16,7 @@ const key= "process.env.OPENAI_API_KEY"
 async function OpenAIStream(payload: OpenAIStreamPayload) {
 	const encoder = new TextEncoder();
 	const decoder = new TextDecoder();
-
 	let counter = 0;
-
 	const res = await fetch('https://api.openai.com/v1/completions', {
 		headers: {
 			'Content-Type': 'application/json',
