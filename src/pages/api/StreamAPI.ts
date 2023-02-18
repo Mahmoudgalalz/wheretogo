@@ -67,7 +67,8 @@ async function OpenAIStream(payload: OpenAIStreamPayload) {
 	return stream;
 }
 
-export const get:APIRoute = async function get () {
+export const post:APIRoute = async function post ({request}) {
+    const {searched}= await request.json()
 	const payload = {
 		model: 'text-davinci-003',
 		prompt: "Say Hi",
