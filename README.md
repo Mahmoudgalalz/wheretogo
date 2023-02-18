@@ -1,7 +1,7 @@
 
 # [WhereToGo](https://www.wheretogo.pages.dev/)
 
-This project generates Twitter bios for you using AI.
+This project Recommend places for you using AI.
 
 [![WhereToGo](https://user-images.githubusercontent.com/42272376/219830703-0bb2a3db-62f1-4f8d-b32f-ed3b40528311.png)](https://www.wheretogo.pages.dev/)
 
