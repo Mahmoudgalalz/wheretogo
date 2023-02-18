@@ -1,5 +1,5 @@
 import { createParser } from 'eventsource-parser';
-import type { APIRoute } from "astro";
+import type { APIContext, APIRoute } from "astro";
 
 interface OpenAIStreamPayload {
 	model: string;
@@ -67,11 +67,11 @@ async function OpenAIStream(payload: OpenAIStreamPayload) {
 	return stream;
 }
 
-export const post:APIRoute = async function post ({request}) {
+export const post:APIRoute = async function post({request}:APIContext) {
     const {searched}= await request.json()
 	const payload = {
 		model: 'text-davinci-003',
-		prompt: "Say Hi",
+		prompt: searched,
 		temperature: 0.7,
 		max_tokens: 2048,
 		top_p: 1.0,

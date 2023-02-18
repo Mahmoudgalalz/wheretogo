@@ -4,6 +4,7 @@ import Map from '../icons/Map.astro';
 import Github from '../icons/Github.astro';
 import { town,mode,purpose } from '../util/Lists';
 import Twitter from '../icons/Twitter.astro';
+import Recommendations from '../components/Recommendations.astro';
 
 ---
 
@@ -20,40 +21,79 @@ import Twitter from '../icons/Twitter.astro';
 			<div class="w-40 my-20 flex m-auto rounded-lg bg-primary shadow-lg p-2 justify-center border-2 border-secondary hover:bg-secondary duration-150 hover:scale-105 hover:text-primary">
 				<a href="https://github.com/mahmoudgalalz/wheretogo" target="_blank" class="flex items-center "><Github/> Star in GitHub</a>
 			</div>
-			<h1 class="text-5xl font-bold text-center">Let AI help you to find where to go, and enjoy time with your friends in <span class="text-transparent bg-clip-text bg-gradient-to-r from-secondary/90 to-accent">Egypt</span></h1>
+			<h1 class="text-4xl mx-4 sm:text-5xl font-bold text-center">Let AI help you to find where to go, and enjoy time with your friends in <span class="text-transparent bg-clip-text bg-gradient-to-r from-secondary/90 to-accent">Egypt</span></h1>
 			<div class="text-xl text-secondary flex flex-col my-8 mx-4 sm:mx-20">
-				<label class="my-4" for="Cities">Which City:</label>
+				<label class="my-4" for="Cities">Which City: *</label>
 				<select class="border-secondary p-2 rounded-md" name="city" id="city" required>
+					<option value=''>Select</option>
 					{town.map((city)=>{
 						return <option value={city.toLowerCase()}>{city}</option>
 					})}
 				</select>
 				<label class="my-4" for="mode">Place Mode:</label>
 				<select class="border-secondary p-2 rounded-md" name="mode" id="mode" required>
+					<option value=''>Select</option>
 					{mode.map((mode)=>{
 						return <option value={mode.toLowerCase()}>{mode}</option>
 					})}
 				</select>
 				<label class="my-4" for="Cities">For what purpose:</label>
 				<select class="border-secondary p-2 rounded-md" name="purpose" id="purpose" required>
+					<option value=''>Select</option>
 					{purpose.map((purpose)=>{
 						return <option value={purpose.toLowerCase()}>{purpose}</option>
 					})}
 				</select>
 				<label class="my-4" for="details">More details</label>
-				<input class="h-40 rounded-md p-2 border-secondary border-2" type="text" placeholder="in 9st close to The Metro station...">
+				<input class="h-40 rounded-md p-2 border-secondary border-2" type="text" id="description" placeholder="in 9st close to The Metro station...">
 			</div>
-			<button class="flex mx-auto p-2 border-2 border-secondary rounded-md my-10 shadow-lg hover:bg-secondary hover:text-primary duration-150 hover:scale-95">Gimmy The Places</button>
+			<button id="btn" onclick="shipThePayload()" class="flex mx-auto p-2 border-2 border-secondary rounded-md my-10 shadow-lg hover:bg-secondary hover:text-primary duration-150 hover:scale-95">Gimmy The Places</button>
+			<Recommendations place='Cairo' details='Fuck this'/>
 		</section>
 		
 	</main>
 	<hr class="border shadow-md">
-	<footer class="container mb-10 flex justify-between">
-		<h3 class="">Built with <a href="https://openai.com" target="_blank" class="underline hover:no-underline hover:text-secondary">OpenAI</a>,
+	<footer class="container my-6 flex justify-between">
+		<h3 class="mx-4">Built with <a href="https://openai.com" target="_blank" class="underline hover:no-underline hover:text-secondary">OpenAI</a>,
 			<a href="https://pages.cloudflare.com/" target="_blank" class="underline hover:no-underline hover:text-secondary">Cloudflare Pages</a></h3>
-		<div class="flex">
+		<div class="flex mx-4">
 			<a href="https://twitter.com/eitmg" target="_blank"><Twitter/></a>
 			<a href="https://github.com/mahmoudgalalz/wheretogo" target="_blank"><Github/></a>
 		</div>
 	</footer>
 </Layout>
+<script is:inline>
+	let recommendations=[]
+
+	const city=document.querySelector('#city')
+	const mode=document.querySelector('#mode')
+	const purpose=document.querySelector('#purpose')
+	const description=document.querySelector('#description')
+	const tostingInfo=`Give me a list of 5 places in Egypt in ${city.value}
+${mode.value ? `that fit the mode ${mode.value}.`:''} 
+${purpose.value ? `Make sure its following this purpose ${purpose.value}.`:''}${description.value ? `and make sure that fit the following description as well ${description}.` : ''}${mode.value || purpose.value ? `If you do not have 5 recommendations that fit these criteria perfectly, do your best to suggest other places in this city ${city.value} that I might like.` :''}
+Please return this response as a numbered list with the ${city.value}'s title, followed by a colon, and then a brief description of the ${city.value}. There should be a line of whitespace between each item in the list.
+`
+	async function shipThePayload(){
+		const response=await fetch('http://localhost:3000/api/StreamAPI',{
+			method:'POST',
+			body: JSON.stringify({searched: tostingInfo}),
+			headers:{
+				'content-type':'application/json'
+			}
+		})
+		searchResponse=response.body
+		let x = searchResponse?.split('\n');
+		recommendations = x;
+		recommendations = x.map((d, i) => {
+			if ((x.length - 1 > i || endStream) && d !== '') {
+				const [, title, description] = d.match(/\d\.\s*(.*?):\s*(.*)/);
+				return { title, description };
+			} else {
+				return d;
+			}
+		});
+		console.log(recommendations)
+	}
+	
+</script>
