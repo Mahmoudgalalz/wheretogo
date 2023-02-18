@@ -12,7 +12,7 @@ interface OpenAIStreamPayload {
 	stream: boolean;
 	n: number;
 }
-const key= "process.env.OPENAI_API_KEY"
+const key = "process.env.OPENAI_API_KEY"
 async function OpenAIStream(payload: OpenAIStreamPayload) {
 	const encoder = new TextEncoder();
 	const decoder = new TextDecoder();
@@ -70,7 +70,7 @@ export const post:APIRoute = async function post({request}:APIContext) {
 	const payload = {
 		model: 'text-davinci-003',
 		prompt: searched,
-		temperature: 0.7,
+		temperature: 0.5,
 		max_tokens: 2048,
 		top_p: 1.0,
 		frequency_penalty: 0.0,

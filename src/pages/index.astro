@@ -70,20 +70,15 @@ import Twitter from '../icons/Twitter.astro';
 	let searchResponse = '';
 	let endStream = false;
 	const results=document.querySelector('#results')
-	const city=document.querySelector('#city')
-	const mode=document.querySelector('#mode')
-	const purpose=document.querySelector('#purpose')
-	const description=document.querySelector('#description')
 	const btn=document.querySelector('#btn-text')
-	
-	const tostingInfo=`Give me a list of 5 places in Egypt in ${city.value}
-${mode.value ? `that fit the mode ${mode.value}.`:''} 
-${purpose.value ? `Make sure its following this purpose ${purpose.value}.`:''}${description.value ? `and make sure that fit the following description as well ${description}.` : ''}${mode.value || purpose.value ? `If you do not have 5 recommendations that fit these criteria perfectly, do your best to suggest other places in this city ${city.value} that I might like.` :''}
-Please return this response as a numbered list with the ${city.value}'s title, followed by a colon, and then a brief description of the ${city.value}. There should be a line of whitespace between each item in the list.
-`
 	async function shipThePayload(){
 		if (loading) return;
-		
+		removeLists();
+		const city=document.querySelector('#city')
+		const mode=document.querySelector('#mode')
+		const purpose=document.querySelector('#purpose')
+		const description=document.querySelector('#description')
+		const tostingInfo=`Give me a list of 5 places in Egypt in ${city.value} ${mode.value ? `that fit the mode ${mode.value}.`:''} ${purpose.value ? `Make sure its following this purpose ${purpose.value}.`:''}${description.value ? `and make sure that fit the following description as well ${description}.` : ''}${mode.value || purpose.value ? `If you do not have 5 recommendations that fit these criteria perfectly, do your best to suggest other places in this city ${city.value} that I might like.` :''} Please return this response as a numbered list with the ${city.value}'s title, followed by a colon, and then a brief description of the ${city.value}. There should be a line of whitespace between each item in the list`
 		recommendations = [];
 		searchResponse = '';
 		endStream = false;
@@ -119,9 +114,11 @@ Please return this response as a numbered list with the ${city.value}'s title, f
 				}
 			} catch (err) {
 				error = 'Looks like OpenAI timed out :(';
+				console.log(error)
 			}
 		} else {
 			error = await response.text();
+			console.log(error)
 		}
 		loading = false;
 		let x = searchResponse.split('\n');
@@ -158,5 +155,8 @@ Please return this response as a numbered list with the ${city.value}'s title, f
 		btn.innerText='Gimmy The Places'
 		document.querySelector('#load').classList.add('hidden')
 		btn.classList.remove('my-auto','ml-2')
+	}
+	function removeLists(){
+		results.replaceChildren()
 	}
 </script>
