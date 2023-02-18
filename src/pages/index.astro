@@ -4,7 +4,6 @@ import Map from '../icons/Map.astro';
 import Github from '../icons/Github.astro';
 import { town,mode,purpose } from '../util/Lists';
 import Twitter from '../icons/Twitter.astro';
-import Recommendations from '../components/Recommendations.astro';
 
 ---
 
@@ -48,7 +47,8 @@ import Recommendations from '../components/Recommendations.astro';
 				<input class="h-40 rounded-md p-2 border-secondary border-2" type="text" id="description" placeholder="in 9st close to The Metro station...">
 			</div>
 			<button id="btn" onclick="shipThePayload()" class="flex mx-auto p-2 border-2 border-secondary rounded-md my-10 shadow-lg hover:bg-secondary hover:text-primary duration-150 hover:scale-95">Gimmy The Places</button>
-			<Recommendations place='Cairo' details='Fuck this'/>
+			<div id="results">
+			</div>
 		</section>
 		
 	</main>
@@ -64,7 +64,11 @@ import Recommendations from '../components/Recommendations.astro';
 </Layout>
 <script is:inline>
 	let recommendations=[]
-
+	let loading = false;
+	let error = '';
+	let searchResponse = '';
+	let endStream = false;
+	const results=document.querySelector('#results')
 	const city=document.querySelector('#city')
 	const mode=document.querySelector('#mode')
 	const purpose=document.querySelector('#purpose')
@@ -75,25 +79,71 @@ ${purpose.value ? `Make sure its following this purpose ${purpose.value}.`:''}${
 Please return this response as a numbered list with the ${city.value}'s title, followed by a colon, and then a brief description of the ${city.value}. There should be a line of whitespace between each item in the list.
 `
 	async function shipThePayload(){
-		const response=await fetch('http://localhost:3000/api/StreamAPI',{
+		if (loading) return;
+		recommendations = [];
+		searchResponse = '';
+		endStream = false;
+		loading = true;
+		const response=await fetch('/api/StreamAPI',{
 			method:'POST',
 			body: JSON.stringify({searched: tostingInfo}),
 			headers:{
 				'content-type':'application/json'
 			}
 		})
-		searchResponse=response.body
-		let x = searchResponse?.split('\n');
-		recommendations = x;
+		if (response.ok) {
+			try {
+				const data = response.body;
+				if (!data) {
+					return;
+				}
+				const reader = data.getReader();
+				const decoder = new TextDecoder();
+				while (true) {
+					const { value, done } = await reader.read();
+					const chunkValue = decoder.decode(value);
+					searchResponse += chunkValue;
+					if (done) {
+						endStream = true;
+						break;
+					}
+				}
+			} catch (err) {
+				error = 'Looks like OpenAI timed out :(';
+			}
+		} else {
+			error = await response.text();
+		}
+		loading = false;
+		let x = searchResponse.split('\n');
 		recommendations = x.map((d, i) => {
 			if ((x.length - 1 > i || endStream) && d !== '') {
-				const [, title, description] = d.match(/\d\.\s*(.*?):\s*(.*)/);
+				const [title, description] = d.match(/\d\.\s*(.*?):\s*(.*)/);
 				return { title, description };
-			} else {
-				return d;
 			}
 		});
-		console.log(recommendations)
+		recommendations.forEach(recommendation=>{
+			if(recommendation===undefined)
+				return;
+			else{
+			const ti=recommendation.title.split(":")[1]
+		 	recommendationComponent(ti,recommendation.description)
+		}
+		})
 	}
+
+	 function recommendationComponent(place,details){
+		const main=document.createElement('div')
+		main.setAttribute('class','mb-6 mx-4 sm:mx-20 rounded-md bg-white p-4 shadow')
+		const sub=document.createElement('div')
+		sub.setAttribute('class','text-2xl font-bold mb-2')
+		sub.innerText=details
+		const p=document.createElement('p')
+		p.innerText=place
+		main.appendChild(sub)
+		main.appendChild(p)
+		results.appendChild(main)
+	}
+		
 	
 </script>
