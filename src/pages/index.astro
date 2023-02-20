@@ -63,6 +63,10 @@ import Twitter from '../icons/Twitter.astro';
 	</footer>
 </Layout>
 <script is:inline>
+// analytics
+  import { inject } from '@vercel/analytics';
+  inject();
+
 	let recommendations=[]
 	let loading = false;
 	let error = '';
