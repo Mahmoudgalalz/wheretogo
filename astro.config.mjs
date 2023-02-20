@@ -1,12 +1,11 @@
 import { defineConfig } from 'astro/config';
 import tailwind from "@astrojs/tailwind";
-import cloudflare from "@astrojs/cloudflare";
+import vercel from "@astrojs/vercel/serverless";
 
-// https://astro.build/config
 export default defineConfig({
   integrations: [tailwind()],
   output: "server",
-  adapter: cloudflare(),
+  adapter: vercel(),
   vite: {
     define: {
       "process.env.OPENAI_API_KEY": process.env.OPENAI_API_KEY
